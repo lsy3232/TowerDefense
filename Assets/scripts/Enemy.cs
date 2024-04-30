@@ -8,10 +8,12 @@ public class Enemy : MonoBehaviour
     private Transform[] wayPoints;
     private int currentIndex = 0;
     private Movement2D movement2D;
+    private EnemySpawner enemySpawner;
 
-    public void Setup(Transform[] wayPoints)
+    public void Setup(EnemySpawner enemySpawner, Transform[] wayPoints)
     {
         movement2D = GetComponent<Movement2D>();
+        this.enemySpawner = enemySpawner;
 
         wayPointCount = wayPoints.Length;
         this.wayPoints = new Transform[wayPointCount];
@@ -53,7 +55,12 @@ public class Enemy : MonoBehaviour
 
         else
         {
-            Destroy(gameObject);
+            OnDie();
         }
+    }
+
+    public void OnDie()
+    {
+        enemySpawner.DestroyEnemy(this);
     }
 }
