@@ -5,34 +5,45 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
     [SerializeField]
-    private GameObject enemyPrefab;
-    [SerializeField]
     private GameObject enemyHPSliderPrefab;
     [SerializeField]
     private Transform canvasTransform;
-    [SerializeField]
-    private float spawnTime;
     [SerializeField]
     private Transform[] wayPoints;
     [SerializeField]
     private PlayerHP playerHP;
     [SerializeField]
     private PlayerGold playerGold;
+    private Wave currentWave;
+    private int currnetEnemyCount;
     private List<Enemy> enemyList;
 
     public List<Enemy> EnemyList => enemyList;
 
+    public int CurrnetEnemyCount => currnetEnemyCount;
+    public int MaxEnemyCount => currentWave.maxEnemyCount;
+
     private void Awake() {
         enemyList = new List<Enemy>();
+    }
+
+    public void StartWave(Wave wave)
+    {
+        currentWave = wave;
+
+        currnetEnemyCount = currentWave.maxEnemyCount;
 
         StartCoroutine("SpawnEnemy");
     }
 
     private IEnumerator SpawnEnemy()
     {
-        while(true)
+        int spawnEnemyCount = 0;
+
+        while( spawnEnemyCount < currentWave.maxEnemyCount )
         {
-            GameObject clone = Instantiate(enemyPrefab);
+            int enemyIndex = Random.Range(0, currentWave.enemyPrefabs.Length);
+            GameObject clone = Instantiate(currentWave.enemyPrefabs[enemyIndex]);
             Enemy enemy = clone.GetComponent<Enemy>();
 
             enemy.Setup(this, wayPoints);
@@ -40,7 +51,11 @@ public class EnemySpawner : MonoBehaviour
 
             SpawnEnemyHPSlider(clone);
 
-            yield return new WaitForSeconds(spawnTime);
+            currnetEnemyCount --;
+            
+            spawnEnemyCount ++;
+
+            yield return new WaitForSeconds(currentWave.spawnTime);
         }
     }
 
