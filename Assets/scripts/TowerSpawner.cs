@@ -61,7 +61,9 @@ public class TowerSpawner : MonoBehaviour
         Vector3 position = tileTransform.position + Vector3.back;
         GameObject clone = Instantiate(towerTemplate[towerType].towerPrefab, position, Quaternion.identity);
 
-        clone.GetComponent<TowerWeapon>().Setup(enemySpawner, playerGold, tile);
+        clone.GetComponent<TowerWeapon>().Setup(this, enemySpawner, playerGold, tile);
+
+        OnBuffAllBuffTowers();
 
         Destroy(followTowerClone);
 
@@ -81,6 +83,21 @@ public class TowerSpawner : MonoBehaviour
             }
 
             yield return null;
+        }
+    }
+
+    public void OnBuffAllBuffTowers()
+    {
+        GameObject[] towers = GameObject.FindGameObjectsWithTag("Tower");
+
+        for ( int i = 0; i < towers.Length; ++ i )
+        {
+            TowerWeapon weapon = towers[i].GetComponent<TowerWeapon>();
+
+            if ( weapon.WeaponType == WeaponType.Buff )
+            {
+                weapon.OnBuffAroundTower();
+            }
         }
     }
 }
